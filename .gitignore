@@ -1,1 +1,9 @@
 data/
+
+
+# Redundant code
+code/get_ghcnd_all.bash
+
+code/ghcnd_inventory.bash
+
+code/ghcnd_stations.bash
