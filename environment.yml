@@ -1,11 +1,12 @@
 name: drought
 channels:
   - conda-forge
-  - defaults
+  - base
+  - bioconda
   - R
 dependencies:
   - r-base=4.3
   - r-tidyverse=2.0
   - wget=1.21.4
-  - r-gganimate
-  - r-plotly
+  - snakemake=7.32.4
+  - graphviz=8.1
