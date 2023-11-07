@@ -1,5 +1,5 @@
 data/
-
+practice/
 
 # Redundant code
 code/get_ghcnd_all.bash
@@ -10,3 +10,8 @@ code/ghcnd_stations.bash
 
 #Snakemake
 .snakemake
+
+#Practice code
+code/practice.R
+write_dir.tar.gz/
+write_files.tat.gz/
