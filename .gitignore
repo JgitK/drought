@@ -15,3 +15,7 @@ code/ghcnd_stations.bash
 code/practice.R
 write_dir.tar.gz/
 write_files.tat.gz/
+practice_pipe.gz
+practice.output.gz
+practice.tar.gz
+ghcnd_all/
