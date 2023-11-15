@@ -5,7 +5,7 @@ rule targets:
         "data/ghcnd-inventory.txt",
         "data/ghcnd-stations.txt",
         "data/ghcnd_tidy.tsv.gz",
-        "data/ghcnd_regions.tsv"
+        "data/ghcnd_regions_years.tsv"
 
 rule get_all_archive:
     input: 
@@ -64,12 +64,12 @@ rule summarize_dly_file:
         {input.bash_script}
         """
     
-rule aggregate_stations:
+rule get_regions_years:
     input:
-        r_script = "code/merge_lat_lon.R",
-        data = "ghcnd-stations.txt"
+        r_script = "code/get_regions_years.R",
+        data = "data/ghcnd-inventory.txt"
     output:
-        "data/ghcnd_regions.tsv"
+        "data/ghcnd_regions_years.tsv"
     shell:
         """
         {input.r_script}
