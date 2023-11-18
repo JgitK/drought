@@ -18,12 +18,14 @@ lat_long_prcp <- inner_join(prcp_data, station_data, by = "id") |>
     group_by(latitude, longitude, year) |>
     summarize(mean_prcp = mean(prcp), .groups = "drop") 
 
+lat_long_prcp
+
 end <- format(today(), "%B %d")
 start <- format(today() - 30, "%B %d")
 
 lat_long_prcp |>
     group_by(latitude, longitude) |>
-    mutate(z_score = (mean_prcp - mean(mean_prcp)) / sd(mean_prcp), # z score is observation minus the mean divided by standard deviation
+    mutate(z_score = (mean_prcp - mean(mean_prcp)) / sd(mean_prcp), # z score = observation minus the mean divided by standard deviation
            n = n()) |>
     ungroup() |>
     filter(n >= 50 & year == 2023) |>

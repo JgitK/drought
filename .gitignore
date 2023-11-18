@@ -1,5 +1,6 @@
 data/
 practice/
+Rplots.pdf
 
 # Redundant code
 code/get_ghcnd_all.bash
