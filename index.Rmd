@@ -1,0 +1,32 @@
+---
+title: Drought Index for World
+author: Jackson Kent
+output: html_document
+email_address: jk@jacksonkent.co
+github_repo: https://github.com/JgitK/drought
+---
+
+```{r echo = FALSE, message = FALSE}
+library(lubridate)
+```
+
+```{css echo = FALSE}
+.author, .title{
+    display: none
+}
+
+.main-container {
+    max-width: 100%;
+}
+
+body {
+    background-color: black;
+    color: #f5f5f5;
+    font-size: 1.2vw;
+}
+```
+
+![](visuals/world_drought.png)
+
+Last updated on `r today()`    
+This site was [created](`r rmarkdown::metadata$github_repo`) by Jackson Kent with instruction from Pat Schloss. All of the work in putting this pipleline together is owed to Pat and his Youtube channel, "Riffomonas."
