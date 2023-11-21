@@ -9,3 +9,6 @@ Used "archive" package to extract tar, files; ghcnd_all is too big to decompress
 
 11/13/23
 Used "O" operator in tar extract program to extract and concatenate files from tarball, now using split to lower RAM usage
+
+11/21/23
+Trying to use r-showtext but does not seem to be available for download in my channel. Weird. Can only install locally in R console.

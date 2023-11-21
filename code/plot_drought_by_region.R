@@ -3,61 +3,69 @@
 library(tidyverse)
 library(lubridate)
 library(glue)
-library(showtext)
+#library(showtext)
 
-font_add_google("Roboto slab", family="roboto-slab")
-showtext_auto()
-prcp_data <- read_tsv("data/ghcnd_tidy.tsv.gz") # amount of precipitation for past 30 days
+#font_add_google("Roboto slab", family="roboto-slab")
+#font_add_google("Montserrat", family="montserrat")
 
-station_data <- read_tsv("data/ghcnd_regions_years.tsv") # tells us what station belongs to each region
+#showtext_auto()
 
-# average precipitation over past 30 days for grouped regions
+prcp_data <- read_tsv("data/ghcnd_tidy.tsv.gz")
 
-#anti_join(prcp_data, station_data, by = "id")
-#anti_join(station_data, prcp_data, by = "id")
+station_data <- read_tsv("data/ghcnd_regions_years.tsv")
 
-lat_long_prcp <- inner_join(prcp_data, station_data, by = "id") |>
-    filter((year != first_year & year != last_year) | year == 2023) |>
-    group_by(latitude, longitude, year) |>
-    summarize(mean_prcp = mean(prcp), .groups = "drop") 
+# anti_join(prcp_data, station_data, by = "id")
+# anti_join(station_data, prcp_data, by = "id")
 
-lat_long_prcp
+lat_long_prcp <- inner_join(prcp_data, station_data, by = "id") %>%
+  filter((year != first_year & year != last_year) | year == year(today())) %>% 
+  group_by(latitude, longitude, year) %>%
+  summarize(mean_prcp = mean(prcp), .groups = "drop")
 
 end <- format(today(), "%B %d")
 start <- format(today() - 30, "%B %d")
 
-lat_long_prcp |>
-    group_by(latitude, longitude) |>
-    mutate(z_score = (mean_prcp - mean(mean_prcp)) / sd(mean_prcp), # z score = observation minus the mean divided by standard deviation
-           n = n()) |>
-    ungroup() |>
-    filter(n >= 50 & year == 2023) |>
-    select(latitude, longitude, z_score) |>
-    mutate(z_score = ifelse(z_score > 2, 2, z_score),
-                     ifelse(z_score < -2, -2, z_score)) |>
-        ggplot(aes(x = longitude, y = latitude, fill = z_score)) +
-            geom_tile() +
-            coord_fixed() +
-            scale_fill_gradient2(name = NULL, low = '#ef8a62', mid = '#f5f5f5', 
-                                high = '#67a9cf', midpoint = 0,
-                                breaks = c(-2, -1, 0, 1, 2),
-                                labels = c("<-2", "-1", "0", "1", ">2")) +
-            theme(plot.background = element_rect(fill = "black", color = "black"),
-                  panel.background = element_rect(fill = "black"),
-                  plot.title = element_text(color = "#f5f5f5", size = "16", family="roboto-slab"),
-                  plot.subtitle = element_text(color = "#f5f5f5"), 
-                  plot.caption = element_text(color = "#f5f5f5"),
-                  panel.grid = element_blank(),
-                  legend.background = element_blank(),
-                  legend.text = element_text(color = "#f5f5f5"),
-                  legend.position = c(0.2, 0.2), 
-                  legend.direction = "horizontal",
-                  legend.key.height = unit(0.25, "cm"),
-                  axis.text = element_blank()) +
-                  labs(title = glue("Amount of precipitation from {start} to {end}"), 
-                        subtitle = "Standardized Z-scores for at least past 50 years", 
-                        caption = "Precipitation data collected from GHCN daily data at NOAA")
-            ggsave("visuals/world_drought.png", width = 8, height = 4)
+lat_long_prcp %>%
+  group_by(latitude, longitude) %>%
+  mutate(z_score = (mean_prcp - mean(mean_prcp)) / sd(mean_prcp),
+         n = n()) %>%
+  ungroup() %>%
+  filter(n >= 50 & year == year(today())) %>%
+  select(-n, -mean_prcp, -year) %>% 
+  mutate(z_score = if_else(z_score > 2, 2, z_score), # z score = observation minus the mean divided by standard deviation
+         z_score = if_else(z_score < -2, -2, z_score)) %>%
+  ggplot(aes(x = longitude, y = latitude, fill = z_score)) +
+    geom_tile() +
+    coord_fixed() +
+    scale_fill_gradient2(name = NULL,
+                         low = "#ef8a62", mid = "#f5f5f5", high = "#67a9cf",
+                         midpoint = 0,
+                         breaks = c(-2, -1, 0, 1, 2),
+                         labels = c("<-2", "-1", "0", "1", ">2")) +
+    theme(plot.background = element_rect(fill = "black", color = "black"),
+          panel.background = element_rect(fill = "black"),
+          plot.title = element_text(color = "#f5f5f5", size = 48
+                                    #, family = "roboto-slab"
+                                    ),
+          plot.title.position = "plot",
+          plot.subtitle = element_text(color = "#f5f5f5", size = 32
+                                       #, family = "montserrat"
+                                       ),
+          plot.caption =  element_text(color = "#f5f5f5", size = 28
+                                       #, family = "montserrat"
+                                       ),
+          panel.grid = element_blank(),
+          legend.background = element_blank(),
+          legend.text = element_text(color = "#f5f5f5", size = 18 
+                                       #, family = "montserrat"
+                                       ),
+          legend.position = c(0.15, 0.0),
+          legend.direction = "horizontal",
+          legend.key.height = unit(0.25, "cm"),
+          axis.text = element_blank()) +
+    labs(title = glue("Amount of precipitation for {start} to {end}"),
+         subtitle = "Standardized Z-scores for at least the past 50 years",
+         caption = "Precipitation data collected from GHCN daily data at NOAA")
 
-                                
+ggsave("visuals/world_drought.png", width = 8, height = 4)                 
 
