@@ -29,4 +29,4 @@ body {
 ![](visuals/world_drought.png)
 
 Last updated on `r today()`    
-This site was [created](`r rmarkdown::metadata$github_repo`) by Jackson Kent with instruction from Pat Schloss. All of the work in putting this pipleline together is owed to Pat and his Youtube channel, "Riffomonas."
+This site was [created](`r rmarkdown::metadata$github_repo`) by Jackson Kent with instruction from Pat Schloss. 

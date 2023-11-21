@@ -3,7 +3,10 @@
 library(tidyverse)
 library(lubridate)
 library(glue)
+library(showtext)
 
+font_add_google("Roboto slab", family="roboto-slab")
+showtext_auto()
 prcp_data <- read_tsv("data/ghcnd_tidy.tsv.gz") # amount of precipitation for past 30 days
 
 station_data <- read_tsv("data/ghcnd_regions_years.tsv") # tells us what station belongs to each region
@@ -41,7 +44,7 @@ lat_long_prcp |>
                                 labels = c("<-2", "-1", "0", "1", ">2")) +
             theme(plot.background = element_rect(fill = "black", color = "black"),
                   panel.background = element_rect(fill = "black"),
-                  plot.title = element_text(color = "#f5f5f5", size = "16"),
+                  plot.title = element_text(color = "#f5f5f5", size = "16", family="roboto-slab"),
                   plot.subtitle = element_text(color = "#f5f5f5"), 
                   plot.caption = element_text(color = "#f5f5f5"),
                   panel.grid = element_blank(),
