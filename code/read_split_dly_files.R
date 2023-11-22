@@ -1,11 +1,13 @@
 #!/usr/bin/env Rscript
 
+### READING FILES OUT OF MASSIVE TAR BALL ###
+
 library(tidyverse)
 #library(archive)
 library(glue)
 library(lubridate)
 
-tday_julian = yday(today())
+tday_julian = yday(today() - 5)
 window <- 30
 quadruple <- function(x){
 
