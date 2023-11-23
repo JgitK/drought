@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is running snakemake workflow 🚀
 on: 
  #push:
  schedule:
-  - cron: '15 16 * * *'
+  - cron: '02 6 * * *'
  
 jobs:
   Run-Drought-Index-Workflow:
