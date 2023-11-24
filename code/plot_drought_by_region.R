@@ -39,6 +39,11 @@ lat_long_prcp <- inner_join(prcp_data, station_data, by = "id") %>%
   group_by(latitude, longitude, year) %>%
   summarize(mean_prcp = mean(prcp), .groups = "drop")
 
+world_map <- map_data("world") |>
+    filter(region != "Antarctica")#|>
+    #mutate(lat = round(lat),
+           #long = round(long))
+
 lat_long_prcp %>%
   group_by(latitude, longitude) %>%
   mutate(z_score = (mean_prcp - mean(mean_prcp)) / sd(mean_prcp),
@@ -49,6 +54,9 @@ lat_long_prcp %>%
   mutate(z_score = if_else(z_score > 2, 2, z_score), # z score = observation minus the mean divided by standard deviation
          z_score = if_else(z_score < -2, -2, z_score)) %>%
   ggplot(aes(x = longitude, y = latitude, fill = z_score)) +
+  geom_map(data = world_map, aes(map_id = region),
+           map = world_map, fill = NA, color = "#f5f5f5", size = 0.05, inherit.aes = F) +
+           expand_limits(x = world_map$longitude, y = world_map$latitude) +
     geom_tile() +
     coord_fixed() +
     scale_fill_gradient2(name = NULL,
@@ -82,4 +90,5 @@ lat_long_prcp %>%
          caption = "Precipitation data collected from GHCN daily data at NOAA")
 
 ggsave("visuals/world_drought.png", width = 8, height = 4)                 
+
 

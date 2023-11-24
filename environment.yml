@@ -8,6 +8,7 @@ dependencies:
   - r-base=4.3
   - r-tidyverse=2.0
   - r-rmarkdown=2.25
+  - r-maps=3.4
   #- r-showtext
   - wget
   - snakemake=7.32.4
