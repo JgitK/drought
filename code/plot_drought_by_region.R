@@ -85,7 +85,7 @@ lat_long_prcp %>%
           legend.direction = "horizontal",
           legend.key.height = unit(0.25, "cm"),
           axis.text = element_blank()) +
-    labs(title = glue("Amount of precipitation for {date_range}"),
+    labs(title = glue("Precipitation for {date_range}"),
          subtitle = "Standardized Z-scores for at least the past 50 years",
          caption = "Precipitation data collected from GHCN daily data at NOAA")
 
