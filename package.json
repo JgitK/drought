@@ -1,0 +1,24 @@
+{
+  "name": "drought",
+  "version": "1.0.0",
+  "description": "How does this month's precipitation compare to the 50 year average over the same period?",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:53206/git/JgitK/drought"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}

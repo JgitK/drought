@@ -1,13 +1,14 @@
 rule targets:
     input:
-        "data/ghcnd_all.tar.gz",  
-        "data/ghcnd_all_files.txt", 
+        "data/ghcnd_all.tar.gz",
+        "data/ghcnd_all_files.txt",
         "data/ghcnd-inventory.txt",
         "data/ghcnd-stations.txt",
         "data/ghcnd_tidy.tsv.gz",
         "data/ghcnd_regions_years.tsv",
+        "data/drought_data.geojson",
         "visuals/world_drought.png",
-        "index.html"
+        "dist/index.html"
 
 rule get_all_archive:
     input: 
@@ -101,6 +102,35 @@ rule plot_drought_by_region:
     shell:
         """
         {input.r_script}
+        """
+
+rule export_geojson:
+    input:
+        r_script = "code/export_geojson.R",
+        prcp_data = "data/ghcnd_tidy.tsv.gz",
+        station_data = "data/ghcnd_regions_years.tsv"
+    output:
+        "data/drought_data.geojson"
+    conda:
+        "environment.yml"
+    shell:
+        """
+        {input.r_script}
+        """
+
+rule build_webapp:
+    input:
+        geojson = "data/drought_data.geojson",
+        html = "index.html",
+        js = "src/main.js",
+        css = "src/style.css",
+        config = "vite.config.js",
+        pkg = "package.json"
+    output:
+        "dist/index.html"
+    shell:
+        """
+        npm run build
         """
 
 rule render_index:

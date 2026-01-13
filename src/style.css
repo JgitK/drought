@@ -1,0 +1,375 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #000;
+    color: #f5f5f5;
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    padding: 1rem 2rem;
+    background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+    border-bottom: 1px solid #333;
+    z-index: 1000;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+header .subtitle {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+.search-container {
+    position: relative;
+    padding: 0.75rem 2rem;
+    background-color: #0a0a0a;
+    border-bottom: 1px solid #333;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 999;
+}
+
+#location-search {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #f5f5f5;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+#location-search:focus {
+    outline: none;
+    border-color: #67a9cf;
+}
+
+#search-btn {
+    padding: 0.6rem 1.5rem;
+    background-color: #67a9cf;
+    border: none;
+    border-radius: 4px;
+    color: #000;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#search-btn:hover {
+    background-color: #5a9bc4;
+}
+
+#search-btn:active {
+    background-color: #4d8db8;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 2rem;
+    right: 2rem;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1001;
+}
+
+.search-results.active {
+    display: block;
+}
+
+.search-result-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #2a2a2a;
+}
+
+.search-result-item .result-name {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+.search-result-item .result-details {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+#map {
+    flex: 1;
+    background-color: #000;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+    border-radius: 8px;
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 250px;
+}
+
+.popup-header {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+}
+
+.popup-header h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.popup-header .coordinates {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.popup-body {
+    padding: 1rem;
+}
+
+.popup-stat {
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-stat:last-child {
+    margin-bottom: 0;
+}
+
+.popup-stat .label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.popup-stat .value {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.z-score-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.z-score-badge.dry {
+    background-color: #ef8a62;
+    color: #000;
+}
+
+.z-score-badge.normal {
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+.z-score-badge.wet {
+    background-color: #67a9cf;
+    color: #000;
+}
+
+.leaflet-popup-tip {
+    background-color: #1a1a1a;
+}
+
+.leaflet-popup-close-button {
+    color: #f5f5f5 !important;
+}
+
+.leaflet-popup-close-button:hover {
+    color: #67a9cf !important;
+}
+
+.legend {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    background-color: rgba(26, 26, 26, 0.95);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    z-index: 1000;
+    min-width: 280px;
+}
+
+.legend-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.legend-gradient {
+    position: relative;
+    height: 60px;
+}
+
+.gradient-bar {
+    position: absolute;
+    top: 50%;
+    left: 60px;
+    right: 60px;
+    height: 20px;
+    transform: translateY(-50%);
+    background: linear-gradient(to right, #ef8a62, #f5f5f5, #67a9cf);
+    border-radius: 4px;
+}
+
+.legend-label {
+    position: absolute;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.legend-label.left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.legend-label.right {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.label-sub {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    display: block;
+}
+
+footer {
+    padding: 1rem 2rem;
+    background-color: #0a0a0a;
+    border-top: 1px solid #333;
+    font-size: 0.85rem;
+    text-align: center;
+    z-index: 1000;
+}
+
+footer p {
+    line-height: 1.6;
+}
+
+footer a {
+    color: #67a9cf;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: #5a9bc4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header {
+        padding: 0.75rem 1rem;
+    }
+
+    header h1 {
+        font-size: 1.4rem;
+    }
+
+    header .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .search-container {
+        padding: 0.5rem 1rem;
+        flex-direction: column;
+    }
+
+    #search-btn {
+        width: 100%;
+    }
+
+    .legend {
+        bottom: 60px;
+        left: 10px;
+        right: 10px;
+        min-width: auto;
+        padding: 0.75rem;
+    }
+
+    .legend-title {
+        font-size: 0.85rem;
+    }
+
+    footer {
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Loading indicator */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2000;
+}
+
+.loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #333;
+    border-top-color: #67a9cf;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading .message {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    opacity: 0.8;
+}

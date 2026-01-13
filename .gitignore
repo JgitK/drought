@@ -1,23 +1,30 @@
-data/
-practice/
-Rplots.pdf
-.DS_store
+# Node
+node_modules/
+dist/
+*.log
 
-# Redundant code
-code/get_ghcnd_all.bash
+# R
+.Rhistory
+.RData
+.Rproj.user
 
-code/ghcnd_inventory.bash
+# Data files (large)
+data/ghcnd_*.tar.gz
+data/temp/
 
-code/ghcnd_stations.bash
+# Environment
+.env
+.env.local
 
-#Snakemake
-.snakemake
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-#Practice code
-code/practice.R
-write_dir.tar.gz/
-write_files.tat.gz/
-practice_pipe.gz
-practice.output.gz
-practice.tar.gz
-ghcnd_all/
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+index.html.backup
