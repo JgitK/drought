@@ -28,3 +28,5 @@ Thumbs.db
 
 # Build artifacts
 index.html.backup
+*.tar.gz
+dist/
