@@ -3,7 +3,7 @@ import { copyFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 export default defineConfig({
-  base: '/drought/',  // GitHub Pages base path
+  base: process.env.NODE_ENV === 'production' ? '/drought/' : '/',  // GitHub Pages base path in production only
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
