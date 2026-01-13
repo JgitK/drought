@@ -30,3 +30,4 @@ Thumbs.db
 index.html.backup
 *.tar.gz
 dist/
+*.zip
