@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Drought Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script type="module" crossorigin src="/drought/assets/index-DBv4U5Xz.js"></script>
+  <link rel="stylesheet" crossorigin href="/drought/assets/index-DS0U6xeE.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>World Drought Monitor</h1>
+            <p class="subtitle">Precipitation Z-scores for the past 30 days</p>
+        </header>
+
+        <div class="search-container">
+            <input
+                type="text"
+                id="location-search"
+                placeholder="Search for a location (e.g., Los Angeles, London, Tokyo)"
+                autocomplete="off"
+            />
+            <button id="search-btn">Search</button>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="legend">
+            <div class="legend-title">Z-Score</div>
+            <div class="legend-gradient">
+                <div class="legend-label left">&lt; -2<br/><span class="label-sub">Much Drier</span></div>
+                <div class="gradient-bar"></div>
+                <div class="legend-label right">&gt; 2<br/><span class="label-sub">Much Wetter</span></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                <strong>Last updated:</strong> <span id="update-date">Loading...</span><br/>
+                Data source: NOAA GHCN Daily Data |
+                Created by <a href="https://jacksonkent.co" target="_blank">Jackson Kent</a> |
+                <a href="https://github.com/JgitK/drought" target="_blank">View on GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+</body>
+</html>

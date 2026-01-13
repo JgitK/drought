@@ -1,0 +1,37 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "date_range": "December 14, 2025 to January 13, 2026",
+    "date_start": "2025-12-14",
+    "date_end": "2026-01-13",
+    "description": "Sample precipitation Z-scores for the past 30 days (DEVELOPMENT DATA)",
+    "source": "NOAA GHCN Daily Data (simulated)",
+    "generated": "2026-01-13",
+    "is_sample": true
+  },
+  "features": [
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-122.4, 37.8]}, "properties": {"z_score": -1.5, "z_score_raw": -1.52, "current_prcp": 3.2, "historical_mean": 5.1, "historical_sd": 0.9, "years_of_data": 67, "latitude": 37.8, "longitude": -122.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-118.2, 34.0]}, "properties": {"z_score": -2.0, "z_score_raw": -2.1, "current_prcp": 1.5, "historical_mean": 4.8, "historical_sd": 1.2, "years_of_data": 72, "latitude": 34.0, "longitude": -118.2}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-87.6, 41.9]}, "properties": {"z_score": 0.8, "z_score_raw": 0.82, "current_prcp": 6.5, "historical_mean": 5.2, "historical_sd": 1.1, "years_of_data": 85, "latitude": 41.9, "longitude": -87.6}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-73.9, 40.7]}, "properties": {"z_score": 1.2, "z_score_raw": 1.25, "current_prcp": 7.3, "historical_mean": 5.5, "historical_sd": 1.3, "years_of_data": 92, "latitude": 40.7, "longitude": -73.9}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-95.4, 29.8]}, "properties": {"z_score": 0.3, "z_score_raw": 0.28, "current_prcp": 5.8, "historical_mean": 5.4, "historical_sd": 1.0, "years_of_data": 65, "latitude": 29.8, "longitude": -95.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-0.1, 51.5]}, "properties": {"z_score": 1.5, "z_score_raw": 1.48, "current_prcp": 7.8, "historical_mean": 5.1, "historical_sd": 1.2, "years_of_data": 95, "latitude": 51.5, "longitude": -0.1}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [2.3, 48.9]}, "properties": {"z_score": 0.9, "z_score_raw": 0.92, "current_prcp": 6.2, "historical_mean": 4.9, "historical_sd": 1.1, "years_of_data": 88, "latitude": 48.9, "longitude": 2.3}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.4, 52.5]}, "properties": {"z_score": -0.5, "z_score_raw": -0.48, "current_prcp": 4.1, "historical_mean": 4.8, "historical_sd": 0.9, "years_of_data": 78, "latitude": 52.5, "longitude": 13.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [12.5, 41.9]}, "properties": {"z_score": -1.8, "z_score_raw": -1.82, "current_prcp": 2.5, "historical_mean": 5.3, "historical_sd": 1.2, "years_of_data": 82, "latitude": 41.9, "longitude": 12.5}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-3.7, 40.4]}, "properties": {"z_score": -2.0, "z_score_raw": -2.3, "current_prcp": 1.2, "historical_mean": 4.5, "historical_sd": 1.0, "years_of_data": 75, "latitude": 40.4, "longitude": -3.7}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [139.7, 35.7]}, "properties": {"z_score": 1.1, "z_score_raw": 1.15, "current_prcp": 6.8, "historical_mean": 5.3, "historical_sd": 1.2, "years_of_data": 91, "latitude": 35.7, "longitude": 139.7}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [116.4, 39.9]}, "properties": {"z_score": -1.2, "z_score_raw": -1.18, "current_prcp": 3.5, "historical_mean": 5.2, "historical_sd": 1.1, "years_of_data": 68, "latitude": 39.9, "longitude": 116.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.5, 31.2]}, "properties": {"z_score": 0.7, "z_score_raw": 0.72, "current_prcp": 6.1, "historical_mean": 5.4, "historical_sd": 0.9, "years_of_data": 73, "latitude": 31.2, "longitude": 121.5}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [77.2, 28.6]}, "properties": {"z_score": -1.9, "z_score_raw": -1.88, "current_prcp": 2.1, "historical_mean": 5.1, "historical_sd": 1.3, "years_of_data": 64, "latitude": 28.6, "longitude": 77.2}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [72.9, 19.1]}, "properties": {"z_score": 1.8, "z_score_raw": 1.82, "current_prcp": 8.2, "historical_mean": 5.0, "historical_sd": 1.4, "years_of_data": 87, "latitude": 19.1, "longitude": 72.9}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [151.2, -33.9]}, "properties": {"z_score": -1.3, "z_score_raw": -1.32, "current_prcp": 3.8, "historical_mean": 5.7, "historical_sd": 1.2, "years_of_data": 79, "latitude": -33.9, "longitude": 151.2}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [144.9, -37.8]}, "properties": {"z_score": -0.8, "z_score_raw": -0.79, "current_prcp": 4.3, "historical_mean": 5.3, "historical_sd": 1.0, "years_of_data": 71, "latitude": -37.8, "longitude": 144.9}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-58.4, -34.6]}, "properties": {"z_score": 0.5, "z_score_raw": 0.52, "current_prcp": 5.9, "historical_mean": 5.4, "historical_sd": 0.8, "years_of_data": 66, "latitude": -34.6, "longitude": -58.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-47.9, -15.8]}, "properties": {"z_score": 1.6, "z_score_raw": 1.58, "current_prcp": 7.5, "historical_mean": 4.8, "historical_sd": 1.3, "years_of_data": 62, "latitude": -15.8, "longitude": -47.9}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [-77.0, -12.0]}, "properties": {"z_score": -2.0, "z_score_raw": -2.05, "current_prcp": 1.8, "historical_mean": 4.9, "historical_sd": 1.2, "years_of_data": 70, "latitude": -12.0, "longitude": -77.0}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [18.4, -33.9]}, "properties": {"z_score": -2.0, "z_score_raw": -2.2, "current_prcp": 1.5, "historical_mean": 4.7, "historical_sd": 1.1, "years_of_data": 76, "latitude": -33.9, "longitude": 18.4}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [31.2, 30.0]}, "properties": {"z_score": -1.1, "z_score_raw": -1.08, "current_prcp": 3.6, "historical_mean": 5.0, "historical_sd": 1.0, "years_of_data": 80, "latitude": 30.0, "longitude": 31.2}},
+    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [28.0, -26.2]}, "properties": {"z_score": 0.4, "z_score_raw": 0.38, "current_prcp": 5.7, "historical_mean": 5.3, "historical_sd": 0.9, "years_of_data": 69, "latitude": -26.2, "longitude": 28.0}}
+  ]
+}
