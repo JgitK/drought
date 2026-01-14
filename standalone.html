@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Drought Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #000; color: #f5f5f5; overflow: hidden; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        header { padding: 1rem 2rem; background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); border-bottom: 1px solid #333; z-index: 1000; }
+        header h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 0.25rem; }
+        header .subtitle { font-size: 0.95rem; opacity: 0.8; font-weight: 400; }
+        .search-container { position: relative; padding: 0.75rem 2rem; background-color: #0a0a0a; border-bottom: 1px solid #333; display: flex; gap: 0.5rem; z-index: 999; }
+        #location-search { flex: 1; padding: 0.6rem 1rem; background-color: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #f5f5f5; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; transition: border-color 0.2s; }
+        #location-search:focus { outline: none; border-color: #67a9cf; }
+        #search-btn { padding: 0.6rem 1.5rem; background-color: #67a9cf; border: none; border-radius: 4px; color: #000; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: background-color 0.2s; }
+        #search-btn:hover { background-color: #5a9bc4; }
+        .search-results { position: absolute; top: 100%; left: 2rem; right: 2rem; background-color: #1a1a1a; border: 1px solid #333; border-top: none; border-radius: 0 0 4px 4px; max-height: 300px; overflow-y: auto; display: none; z-index: 1001; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #333; transition: background-color 0.2s; }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background-color: #2a2a2a; }
+        .search-result-item .result-name { font-weight: 600; margin-bottom: 0.2rem; }
+        .search-result-item .result-details { font-size: 0.85rem; opacity: 0.7; }
+        #map { flex: 1; background-color: #000; }
+        .leaflet-popup-content-wrapper { background-color: #1a1a1a; color: #f5f5f5; border-radius: 8px; padding: 0; }
+        .leaflet-popup-content { margin: 0; min-width: 250px; }
+        .popup-header { background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%); padding: 0.75rem 1rem; border-bottom: 1px solid #333; }
+        .popup-header h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .popup-header .coordinates { font-size: 0.8rem; opacity: 0.7; }
+        .popup-body { padding: 1rem; }
+        .popup-stat { margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+        .popup-stat:last-child { margin-bottom: 0; }
+        .popup-stat .label { font-size: 0.85rem; opacity: 0.8; }
+        .popup-stat .value { font-weight: 600; font-size: 1rem; }
+        .z-score-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: 600; font-size: 1.1rem; }
+        .z-score-badge.dry { background-color: #ef8a62; color: #000; }
+        .z-score-badge.normal { background-color: #f5f5f5; color: #000; }
+        .z-score-badge.wet { background-color: #67a9cf; color: #000; }
+        .leaflet-popup-tip { background-color: #1a1a1a; }
+        .leaflet-popup-close-button { color: #f5f5f5 !important; }
+        .legend { position: absolute; bottom: 80px; left: 20px; background-color: rgba(26, 26, 26, 0.95); padding: 1rem; border-radius: 8px; border: 1px solid #333; z-index: 1000; min-width: 280px; }
+        .legend-title { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .legend-gradient { position: relative; height: 60px; }
+        .gradient-bar { position: absolute; top: 50%; left: 60px; right: 60px; height: 20px; transform: translateY(-50%); background: linear-gradient(to right, #ef8a62, #f5f5f5, #67a9cf); border-radius: 4px; }
+        .legend-label { position: absolute; font-size: 0.85rem; line-height: 1.2; text-align: center; }
+        .legend-label.left { left: 0; top: 50%; transform: translateY(-50%); }
+        .legend-label.right { right: 0; top: 50%; transform: translateY(-50%); }
+        .label-sub { font-size: 0.7rem; opacity: 0.7; display: block; }
+        footer { padding: 1rem 2rem; background-color: #0a0a0a; border-top: 1px solid #333; font-size: 0.85rem; text-align: center; z-index: 1000; }
+        footer p { line-height: 1.6; }
+        footer a { color: #67a9cf; text-decoration: none; transition: color 0.2s; }
+        footer a:hover { color: #5a9bc4; }
+        @media (max-width: 768px) {
+            header { padding: 0.75rem 1rem; }
+            header h1 { font-size: 1.4rem; }
+            .search-container { padding: 0.5rem 1rem; flex-direction: column; }
+            .legend { bottom: 60px; left: 10px; right: 10px; min-width: auto; padding: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>World Drought Monitor</h1>
+            <p class="subtitle">Precipitation Z-scores for the past 30 days</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="location-search" placeholder="Search for a location (e.g., Los Angeles, London, Tokyo)" autocomplete="off"/>
+            <button id="search-btn">Search</button>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="legend">
+            <div class="legend-title">Z-Score</div>
+            <div class="legend-gradient">
+                <div class="legend-label left">&lt; -2<br/><span class="label-sub">Much Drier</span></div>
+                <div class="gradient-bar"></div>
+                <div class="legend-label right">&gt; 2<br/><span class="label-sub">Much Wetter</span></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                <strong>Last updated:</strong> <span id="update-date">December 14, 2025 to January 13, 2026 (SAMPLE DATA)</span><br/>
+                Data source: NOAA GHCN Daily Data | Created by <a href="https://jacksonkent.co" target="_blank">Jackson Kent</a> | <a href="https://github.com/JgitK/drought" target="_blank">View on GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Embedded GeoJSON data
+        const droughtData = {"type":"FeatureCollection","metadata":{"date_range":"December 14, 2025 to January 13, 2026","date_start":"2025-12-14","date_end":"2026-01-13","description":"Sample precipitation Z-scores for the past 30 days (DEVELOPMENT DATA)","source":"NOAA GHCN Daily Data (simulated)","generated":"2026-01-13","is_sample":true},"features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[-122.4,37.8]},"properties":{"z_score":-1.5,"z_score_raw":-1.52,"current_prcp":3.2,"historical_mean":5.1,"historical_sd":0.9,"years_of_data":67,"latitude":37.8,"longitude":-122.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-118.2,34]},"properties":{"z_score":-2,"z_score_raw":-2.1,"current_prcp":1.5,"historical_mean":4.8,"historical_sd":1.2,"years_of_data":72,"latitude":34,"longitude":-118.2}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-87.6,41.9]},"properties":{"z_score":0.8,"z_score_raw":0.82,"current_prcp":6.5,"historical_mean":5.2,"historical_sd":1.1,"years_of_data":85,"latitude":41.9,"longitude":-87.6}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-73.9,40.7]},"properties":{"z_score":1.2,"z_score_raw":1.25,"current_prcp":7.3,"historical_mean":5.5,"historical_sd":1.3,"years_of_data":92,"latitude":40.7,"longitude":-73.9}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-95.4,29.8]},"properties":{"z_score":0.3,"z_score_raw":0.28,"current_prcp":5.8,"historical_mean":5.4,"historical_sd":1,"years_of_data":65,"latitude":29.8,"longitude":-95.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-0.1,51.5]},"properties":{"z_score":1.5,"z_score_raw":1.48,"current_prcp":7.8,"historical_mean":5.1,"historical_sd":1.2,"years_of_data":95,"latitude":51.5,"longitude":-0.1}},{"type":"Feature","geometry":{"type":"Point","coordinates":[2.3,48.9]},"properties":{"z_score":0.9,"z_score_raw":0.92,"current_prcp":6.2,"historical_mean":4.9,"historical_sd":1.1,"years_of_data":88,"latitude":48.9,"longitude":2.3}},{"type":"Feature","geometry":{"type":"Point","coordinates":[13.4,52.5]},"properties":{"z_score":-0.5,"z_score_raw":-0.48,"current_prcp":4.1,"historical_mean":4.8,"historical_sd":0.9,"years_of_data":78,"latitude":52.5,"longitude":13.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[12.5,41.9]},"properties":{"z_score":-1.8,"z_score_raw":-1.82,"current_prcp":2.5,"historical_mean":5.3,"historical_sd":1.2,"years_of_data":82,"latitude":41.9,"longitude":12.5}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-3.7,40.4]},"properties":{"z_score":-2,"z_score_raw":-2.3,"current_prcp":1.2,"historical_mean":4.5,"historical_sd":1,"years_of_data":75,"latitude":40.4,"longitude":-3.7}},{"type":"Feature","geometry":{"type":"Point","coordinates":[139.7,35.7]},"properties":{"z_score":1.1,"z_score_raw":1.15,"current_prcp":6.8,"historical_mean":5.3,"historical_sd":1.2,"years_of_data":91,"latitude":35.7,"longitude":139.7}},{"type":"Feature","geometry":{"type":"Point","coordinates":[116.4,39.9]},"properties":{"z_score":-1.2,"z_score_raw":-1.18,"current_prcp":3.5,"historical_mean":5.2,"historical_sd":1.1,"years_of_data":68,"latitude":39.9,"longitude":116.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[121.5,31.2]},"properties":{"z_score":0.7,"z_score_raw":0.72,"current_prcp":6.1,"historical_mean":5.4,"historical_sd":0.9,"years_of_data":73,"latitude":31.2,"longitude":121.5}},{"type":"Feature","geometry":{"type":"Point","coordinates":[77.2,28.6]},"properties":{"z_score":-1.9,"z_score_raw":-1.88,"current_prcp":2.1,"historical_mean":5.1,"historical_sd":1.3,"years_of_data":64,"latitude":28.6,"longitude":77.2}},{"type":"Feature","geometry":{"type":"Point","coordinates":[72.9,19.1]},"properties":{"z_score":1.8,"z_score_raw":1.82,"current_prcp":8.2,"historical_mean":5,"historical_sd":1.4,"years_of_data":87,"latitude":19.1,"longitude":72.9}},{"type":"Feature","geometry":{"type":"Point","coordinates":[151.2,-33.9]},"properties":{"z_score":-1.3,"z_score_raw":-1.32,"current_prcp":3.8,"historical_mean":5.7,"historical_sd":1.2,"years_of_data":79,"latitude":-33.9,"longitude":151.2}},{"type":"Feature","geometry":{"type":"Point","coordinates":[144.9,-37.8]},"properties":{"z_score":-0.8,"z_score_raw":-0.79,"current_prcp":4.3,"historical_mean":5.3,"historical_sd":1,"years_of_data":71,"latitude":-37.8,"longitude":144.9}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-58.4,-34.6]},"properties":{"z_score":0.5,"z_score_raw":0.52,"current_prcp":5.9,"historical_mean":5.4,"historical_sd":0.8,"years_of_data":66,"latitude":-34.6,"longitude":-58.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-47.9,-15.8]},"properties":{"z_score":1.6,"z_score_raw":1.58,"current_prcp":7.5,"historical_mean":4.8,"historical_sd":1.3,"years_of_data":62,"latitude":-15.8,"longitude":-47.9}},{"type":"Feature","geometry":{"type":"Point","coordinates":[-77,-12]},"properties":{"z_score":-2,"z_score_raw":-2.05,"current_prcp":1.8,"historical_mean":4.9,"historical_sd":1.2,"years_of_data":70,"latitude":-12,"longitude":-77}},{"type":"Feature","geometry":{"type":"Point","coordinates":[18.4,-33.9]},"properties":{"z_score":-2,"z_score_raw":-2.2,"current_prcp":1.5,"historical_mean":4.7,"historical_sd":1.1,"years_of_data":76,"latitude":-33.9,"longitude":18.4}},{"type":"Feature","geometry":{"type":"Point","coordinates":[31.2,30]},"properties":{"z_score":-1.1,"z_score_raw":-1.08,"current_prcp":3.6,"historical_mean":5,"historical_sd":1,"years_of_data":80,"latitude":30,"longitude":31.2}},{"type":"Feature","geometry":{"type":"Point","coordinates":[28,-26.2]},"properties":{"z_score":0.4,"z_score_raw":0.38,"current_prcp":5.7,"historical_mean":5.3,"historical_sd":0.9,"years_of_data":69,"latitude":-26.2,"longitude":28}}]};
+
+        // Initialize map
+        const map = L.map('map', {
+            center: [20, 0],
+            zoom: 2,
+            minZoom: 2,
+            maxZoom: 10,
+            worldCopyJump: true
+        });
+
+        // Add dark base map
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Get color based on Z-score
+        function getColor(zScore) {
+            if (zScore <= -2) return '#ef8a62';
+            if (zScore <= -1) return '#f6b894';
+            if (zScore <= -0.5) return '#fad7c4';
+            if (zScore <= 0.5) return '#f5f5f5';
+            if (zScore <= 1) return '#c4dce8';
+            if (zScore <= 2) return '#8bc3dc';
+            return '#67a9cf';
+        }
+
+        function getStatus(zScore) {
+            if (zScore <= -2) return 'Much Drier than Normal';
+            if (zScore <= -1) return 'Drier than Normal';
+            if (zScore <= -0.5) return 'Slightly Drier';
+            if (zScore <= 0.5) return 'Near Normal';
+            if (zScore <= 1) return 'Slightly Wetter';
+            if (zScore <= 2) return 'Wetter than Normal';
+            return 'Much Wetter than Normal';
+        }
+
+        function getBadgeClass(zScore) {
+            if (zScore < -0.5) return 'dry';
+            if (zScore > 0.5) return 'wet';
+            return 'normal';
+        }
+
+        function createPopupContent(properties) {
+            const { z_score, z_score_raw, current_prcp, historical_mean, years_of_data, latitude, longitude } = properties;
+            const status = getStatus(z_score);
+            const badgeClass = getBadgeClass(z_score);
+
+            return `
+                <div class="popup-header">
+                    <h3>${status}</h3>
+                    <div class="coordinates">${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°</div>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-stat">
+                        <span class="label">Z-Score:</span>
+                        <span class="value"><span class="z-score-badge ${badgeClass}">${z_score_raw.toFixed(2)}</span></span>
+                    </div>
+                    <div class="popup-stat">
+                        <span class="label">Current (30-day):</span>
+                        <span class="value">${current_prcp.toFixed(1)} cm</span>
+                    </div>
+                    <div class="popup-stat">
+                        <span class="label">Historical Average:</span>
+                        <span class="value">${historical_mean.toFixed(1)} cm</span>
+                    </div>
+                    <div class="popup-stat">
+                        <span class="label">Difference:</span>
+                        <span class="value">${(current_prcp - historical_mean).toFixed(1)} cm</span>
+                    </div>
+                    <div class="popup-stat">
+                        <span class="label">Years of Data:</span>
+                        <span class="value">${years_of_data} years</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add drought data
+        const droughtLayer = L.geoJSON(droughtData, {
+            pointToLayer: (feature, latlng) => {
+                const zScore = feature.properties.z_score;
+                return L.circleMarker(latlng, {
+                    radius: 8,
+                    fillColor: getColor(zScore),
+                    color: '#000',
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.7
+                });
+            },
+            onEachFeature: (feature, layer) => {
+                layer.bindPopup(createPopupContent(feature.properties), { maxWidth: 300 });
+                layer.on('mouseover', function() {
+                    this.setStyle({ radius: 12, weight: 2, fillOpacity: 0.9 });
+                });
+                layer.on('mouseout', function() {
+                    this.setStyle({ radius: 8, weight: 1, fillOpacity: 0.7 });
+                });
+            }
+        }).addTo(map);
+
+        // Search functionality
+        let searchTimeout;
+        const searchInput = document.getElementById('location-search');
+        const searchBtn = document.getElementById('search-btn');
+        const searchResults = document.getElementById('search-results');
+
+        async function searchLocation(query) {
+            if (!query || query.length < 3) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+                );
+                const results = await response.json();
+                displaySearchResults(results);
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }
+
+        function displaySearchResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                searchResults.classList.add('active');
+                return;
+            }
+
+            searchResults.innerHTML = results.map(result => `
+                <div class="search-result-item" data-lat="${result.lat}" data-lon="${result.lon}">
+                    <div class="result-name">${result.display_name.split(',')[0]}</div>
+                    <div class="result-details">${result.display_name}</div>
+                </div>
+            `).join('');
+
+            searchResults.classList.add('active');
+
+            searchResults.querySelectorAll('.search-result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const lat = parseFloat(item.dataset.lat);
+                    const lon = parseFloat(item.dataset.lon);
+                    flyToLocation(lat, lon);
+                    searchResults.classList.remove('active');
+                    searchInput.value = '';
+                });
+            });
+        }
+
+        function flyToLocation(lat, lon) {
+            map.flyTo([lat, lon], 6, { duration: 1.5 });
+
+            let nearestStation = null;
+            let minDistance = Infinity;
+
+            droughtData.features.forEach(feature => {
+                const [fLon, fLat] = feature.geometry.coordinates;
+                const distance = Math.sqrt(Math.pow(lat - fLat, 2) + Math.pow(lon - fLon, 2));
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestStation = feature;
+                }
+            });
+
+            if (nearestStation) {
+                setTimeout(() => {
+                    droughtLayer.eachLayer(layer => {
+                        if (layer.feature === nearestStation) {
+                            layer.openPopup();
+                        }
+                    });
+                }, 1600);
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => searchLocation(e.target.value), 300);
+        });
+
+        searchBtn.addEventListener('click', () => searchLocation(searchInput.value));
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchLocation(searchInput.value);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchResults.contains(e.target) && e.target !== searchInput && e.target !== searchBtn) {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
