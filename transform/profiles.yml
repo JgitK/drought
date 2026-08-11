@@ -1,0 +1,7 @@
+jacksons-gaming-pc:
+  outputs:
+    dev:
+  target: dev
+name:
+- type: duckdb
+- path: threads

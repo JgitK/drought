@@ -13,6 +13,14 @@ code/ghcnd_stations.bash
 #Snakemake
 .snakemake
 
+# dbt
+target/
+dbt_packages/
+logs/
+
+# duckdb
+*.duckdb
+
 #Practice code
 code/practice.R
 write_dir.tar.gz/
@@ -21,3 +29,6 @@ practice_pipe.gz
 practice.output.gz
 practice.tar.gz
 ghcnd_all/
+
+.venv/
+warehouse/

@@ -1,0 +1,37 @@
+# Line endings are a property of THIS REPO, not of whoever cloned it.
+# Without this file, correctness depends on each machine's core.autocrlf —
+# a machine-specific setting doing a repo-wide job.
+
+# Default: let Git decide text vs binary, and normalize text to LF in the repo.
+* text=auto
+
+# Files that BREAK on Linux if they carry CRLF.
+# The GitHub Action runs on Linux; a stray \r gives "bad interpreter: /bin/bash^M".
+# eol=lf forces LF in the working tree too, not just in the repo.
+*.bash  text eol=lf
+*.sh    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Kept LF for consistency: these are read by DuckDB/dbt/R and by CI.
+*.sql   text eol=lf
+*.R     text eol=lf
+*.Rmd   text eol=lf
+*.py    text eol=lf
+
+# Docs — LF here also stops the "LF will be replaced by CRLF" warnings.
+*.md    text eol=lf
+
+# Data formats read by the pipeline.
+*.csv   text eol=lf
+*.dly   text eol=lf
+
+# Binary: never translate these. Git already detects them, but being explicit
+# documents the intent and protects against a bad `text` rule later.
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.parquet binary
+*.duckdb  binary
+*.gz    binary
+*.tar   binary
