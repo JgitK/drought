@@ -4,7 +4,7 @@
 appended to. If something here is wrong, fix it — do not add a correction below
 it. History lives in `git log -p docs/STATE.md`.
 
-_Last updated: 2026-08-10_
+_Last updated: 2026-08-12_
 
 ---
 
@@ -47,17 +47,21 @@ OneDrive or `C:\dev\drought` is stale.**
 - venv + all packages, rebuilt in the repo after the move.
 - `warehouse/` created; `.gitignore` covers `.venv/`, `warehouse/`, `*.duckdb`.
 - `transform/` exists with `models/staging|intermediate|marts`.
-- `transform/models/staging/hello.sql` written (verify contents on resume).
+- `transform/models/staging/hello.sql` written — **contains a typo: `seelct`.**
+  Left in place deliberately; it will be the first real dbt error message.
 - Whole `Projects` tree moved out of OneDrive; all 6 repos intact, `git fsck`
   clean, 33,892 files verified.
+- **Everything is committed.** `4da1965` added `docs/`, `CLAUDE.md`,
+  `transform/`, both handoffs; `17488f2` removed `.DS_Store`. Working tree clean
+  on branch `dbt-port`.
 
 **Not done**
-- `transform/dbt_project.yml` — still an empty key skeleton.
-- `transform/profiles.yml` — still skeletal; top key is `jacksons-gaming-pc`,
-  `outputs:`/`target:` empty, `type`/`path`/`threads` wrongly at root as a list.
+- `transform/dbt_project.yml` — still an empty key skeleton (5 bare keys, no
+  values).
+- `transform/profiles.yml` — still broken: top key `jacksons-gaming-pc`,
+  `outputs.dev` empty, and a stray second root key `name:` holding
+  `- type: duckdb` / `- path: threads` as a list.
 - `dbt debug` / `dbt build` never run successfully.
-- **Nothing is committed.** `git status`: ` M .gitignore`, `?? handoff-1.md`,
-  `?? handoff-2.md`, `?? transform/`, `?? docs/`, `?? CLAUDE.md`.
 
 **Leftover cleanup**
 - `rm -rf /c/dev/drought` (superseded venv + warehouse).
