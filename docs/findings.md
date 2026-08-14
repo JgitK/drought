@@ -100,3 +100,50 @@ model have to carry, and why?)_
 
 **In my words:** _(yours — which of these are worth keeping, and which are
 accidents of the original that the port should quietly drop?)_
+
+---
+
+## F-007 — The pipeline uses git as a blob store for build artifacts
+
+**Observation.** `.github/workflows/run_pipeline.yml:39-41` commits the render
+back into the repo on every cron run (`:7` — `cron: '02 6 * * *'`, daily):
+
+```
+git add visuals/world_drought.png index.html
+git commit -m "New day's rendering"
+git push origin main
+```
+
+Measured cost as of 2026-08-13, over 930 commits spanning 2023-11-17 → 2026-08-07:
+
+| Path | Versions | Raw total in history |
+|---|---|---|
+| `index.html` | 876 | **1,092.7 MB** |
+| `visuals/world_drought.png` | 877 | **297.5 MB** |
+| *all other paths combined* | — | **~0.4 MB** |
+
+`.git` is **569 MB**; the working tree is **~2 MB**. Two build artifacts are
+**99.97%** of the repository. Growth is ~0.57 MB/day packed, unbounded.
+
+Note the compression ratio: these blobs pack 1.3 MB → 0.4–0.7 MB, only ~2–3×,
+where source text typically gets 10×+. Git's delta compression can't get
+traction — the PNG is already-compressed binary whose bytes scramble globally
+when the image shifts slightly, and `index.html` is a self-contained Rmd render
+with the map data inlined. Consecutive daily renders share almost no byte runs,
+so each day is stored as effectively a fresh copy.
+
+Two consequences that are easy to miss:
+- The cost is **carried by every branch**. Pushing `dbt-port` for the first time
+  transferred 126 MB — the port branch inherits `main`'s render history.
+- The cost is **paid on every fresh clone, forever**, by anyone who reads this
+  repo — including whoever reads the writeup.
+
+This is also the root of the F-006 bullet about the unconditional `git commit`
+failing on a byte-identical PNG: both are symptoms of treating a VCS as an
+output sink.
+
+**In my words:** _(yours — this one is about the seam between "pipeline" and
+"publishing." What is version control actually for, and what should have been
+holding these renders instead? Also worth a call: per D-00x, do you rewrite
+history to reclaim ~550 MB, or is the bloat itself evidence you want to keep
+standing in the repo as the before-picture?)_

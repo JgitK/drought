@@ -70,9 +70,16 @@ OneDrive or `C:\dev\drought` is stale.**
 
 ## Next actions
 
-1. **Answer the open decision in `docs/decisions.md`** — which materialization
-   each layer gets, and why. Three identical answers means no decision was made.
-2. John rewrites `transform/profiles.yml`:
+⚠️ **D-006 is deliberately deferred — do NOT start there.** On 2026-08-12 the
+attempt to answer it surfaced a foundational gap (layers, build order, what a
+view is). Answering a materialization question before ever watching dbt build a
+DAG is backwards. Do the toy-DAG exercise below first; D-006 becomes easy after.
+Materialization is one line of YAML and is trivially reversible — it is not a
+one-way door.
+
+**THE EXERCISE — start here next session (~30 min, entirely throwaway):**
+
+1. Rewrite `transform/profiles.yml`:
    ```
    <profile name>:
      target: dev
@@ -82,12 +89,32 @@ OneDrive or `C:\dev\drought` is stale.**
          path: ...
          threads: 4
    ```
-3. John rewrites `transform/dbt_project.yml`: flat `name` / `version` / `profile`
-   / `model-paths`, then a `models:` block nesting project name → folder names
-   (`staging`, `intermediate`, `marts`) → `+materialized:`.
-4. `cd transform && dbt debug`, then `dbt build`.
-5. First `docs/translation-log.md` entry.
-6. Begin Step 1 (EL boundary + fixed-width landing).
+   Decide: absolute `path`, or always `cd transform` first (see the CWD caveat
+   under Environment).
+2. Rewrite `transform/dbt_project.yml`: flat `name` / `version` / `profile` /
+   `model-paths`, then a `models:` block nesting project name → folder names
+   (`staging`, `intermediate`, `marts`) → `+materialized:`. **Put `view` on all
+   three for now** — this is not answering D-006, it is getting a toolchain.
+3. `cd transform && dbt debug`.
+4. `dbt build` **with the `seelct` typo still in `hello.sql`** — read the error
+   before fixing it. Then fix it.
+5. Write **four trivial models with hardcoded fake data** — no NOAA files, no
+   fixed-width parsing. Two staging (`select 1 as id, 5.0 as prcp union all …`),
+   one intermediate that `ref()`s and joins both, one mart that `ref()`s the
+   intermediate. Real names, real folders.
+6. `dbt build` and watch the printed order. Then rename a file so it sorts
+   alphabetically last and rebuild — **order does not change.** That is the
+   folders-vs-DAG lesson landing.
+7. `duckdb warehouse/<db>.duckdb` →
+   `SELECT table_name, table_type FROM information_schema.tables;`
+   Flip one folder to `+materialized: table`, `dbt run`, re-query. Watch `VIEW`
+   become `BASE TABLE`. This is the step that makes D-006 concrete.
+8. `dbt docs generate && dbt docs serve` — look at the lineage graph.
+
+**Then:**
+9. Answer D-006 in `docs/decisions.md`.
+10. First `docs/translation-log.md` entry.
+11. Begin Step 1 (EL boundary + fixed-width landing).
 
 ## The 9-step order
 
@@ -118,9 +145,54 @@ OneDrive or `C:\dev\drought` is stale.**
   parallelizes each query across cores for free. This DAG is near-linear, so
   threads buy ~nothing. Nice symmetry with the GH Action's `snakemake --cores 1`.
 
+_Taught 2026-08-12:_
+
+- **Folders do not control build order.** `staging/`/`intermediate/`/`marts/` are
+  plain directories. Order comes from **`ref()`** alone — dbt parses every
+  `ref()`, builds a DAG, topologically sorts. A flat folder would build in the
+  same order. Folders do two things only: organize files, and act as a **config
+  target** for the `models:` block. That is the *only* reason D-006 and the
+  directory layout are connected.
+- **`view` vs `table` is plain SQL, not dbt.** `CREATE TABLE AS` runs the query
+  now and stores rows (pay once at build + disk, goes stale). `CREATE VIEW AS`
+  stores only the query text (zero build, zero storage, but **recomputed on every
+  read, once per referencing model**). Materialization = which `CREATE` dbt wraps
+  the `SELECT` in.
+- **What the layers mean:** staging = one model per source, rename/cast/parse/
+  sentinels, **no joins, no aggregation**. Intermediate = joins and grain
+  changes. Marts = what a consumer asks for. The payoff is isolation of failure,
+  not tidiness.
+
+## Layer mapping — derived 2026-08-12, do not re-derive
+
+| Original R | Model | Layer | Notes |
+|---|---|---|---|
+| `read_split_dly_files.R:25–52` (`read_fwf`, `pivot_longer`, `-9999`, `/100`, `date`) | `stg_daily_prcp` | staging | grain = (station, date). Re-assert `ELEMENT='PRCP'` here — **F-001** |
+| `get_regions_years.R:17–26` (`read_fwf` inventory, `filter(element=="PRCP")`) | `stg_inventory` | staging | grain = (station, element) |
+| `read_split_dly_files.R:53–63` (julian window, wraparound, `sum` by id/year) | `int_station_year_prcp` | intermediate | grain → (station, year). **F-003** lives here |
+| `get_regions_years.R:27–30` (`round()` lat/lon) | `int_grid_cell` | intermediate | step 3. **F-004** lives here |
+| `plot_drought_by_region.R:37–40` (`inner_join`, drop partial years, `mean`) | `int_cell_year_prcp` | intermediate | grain → (cell, year) |
+| `plot_drought_by_region.R:47–55` (z-score, `n>=50`, clip ±2) | `drought_z_score` | mart | |
+
+```
+stg_daily_prcp ──→ int_station_year_prcp ──┐
+                                           ├──→ int_cell_year_prcp ──→ drought_z_score
+stg_inventory  ──→ int_grid_cell ──────────┘
+```
+
+Key point: `read_split_dly_files.R` currently parses **and** windows **and**
+aggregates in one script. Only the parsing half is staging.
+
 ## Open questions
 
-- Materialization per layer (see `docs/decisions.md`, D-006 — unanswered).
+- Materialization per layer (D-006 — unanswered, **deliberately deferred until
+  after the toy-DAG exercise**). Two things to carry in when answering: (a) the
+  "views are costly because many children re-run them" argument is **weak here**
+  — this DAG is near-linear, nearly every model has one child, so don't borrow it
+  from a blog post; the arguments that fit are dev iteration cost on the
+  fixed-width parse, testability, and what step 7's incremental model needs to
+  exist as a real object. (b) `ephemeral` is inlined **per child** (work runs once
+  per child) and **cannot carry schema tests** — usually disqualifying here.
 - Validating against R's numbers needs R runnable; conda is not installed.
   **Plan: do NOT install R yet.** Use dbt unit tests with hand-built fixtures
   through steps 1–4; revisit an end-to-end R diff at step 5, against the subset
